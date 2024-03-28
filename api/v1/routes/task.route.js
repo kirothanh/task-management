@@ -1,29 +1,20 @@
 const express = require('express');
 const router = express.Router();
 
-const Task = require("../../../models/task.model");
+const controller = require("../controllers/task.controller")
 
-router.get("/", async (req, res) => {
-  const tasks = await Task.find({
-    deleted: false
-  })
+router.get("/", controller.index)
 
-  res.json(tasks);
-})
+router.get("/detail/:id", controller.detail)
 
-router.get("/detail/:id", async (req, res) => {
-  try {
-    const id = req.params.id;
+router.patch("/change-status/:id", controller.changeStatus)
 
-    const task = await Task.findOne({
-      _id: id,
-      deleted: false
-    })
+router.patch("/change-multi", controller.changeMulti)
 
-    res.json(task);
-  } catch (error) {
-    res.json("Không tìm thấy!")
-  }
-})
+router.post("/create", controller.create)
+
+router.patch("/edit/:id", controller.edit)
+
+router.delete("/delete/:id", controller.delete)
 
 module.exports = router;
