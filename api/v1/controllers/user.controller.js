@@ -23,7 +23,8 @@ module.exports.register = async (req, res) => {
     const user = new User({
       fullName: req.body.fullName,
       email: req.body.email,
-      password: req.body.password
+      password: req.body.password,
+      token: generateHelper.generateRandomString(20)
     })
 
     user.save();
@@ -94,10 +95,12 @@ module.exports.forgotPassword = async (req, res) => {
 
   const otp = generateHelper.generateRandomNumber(8);
 
+  const timeExpire = 5;
+
   const objectForgotPassword = {
     email: email,
     otp: otp,
-    expireAt: Date.now()
+    expireAt: Date.now() + timeExpire*60*1000
   }
 
   const forgotPassword = new ForgotPassword(objectForgotPassword);
@@ -181,16 +184,23 @@ module.exports.resetPassword = async (req, res) => {
 
 // [GET] /api/v1/users/detail
 module.exports.detail = async (req, res) => {
-  const token = req.cookies.token;
+  res.json({
+    code: 200,
+    message: "Thành công!", 
+    info: req.user
+  })
+}
 
-  const user = await User.findOne({
-    token: token,
+// [GET] /api/v1/users/list
+module.exports.list = async (req, res) => {
+
+  const users = await User.find({
     deleted: false
-  }).select("-password -token")
+  }).select("fullName email")
 
   res.json({
     code: 200,
     message: "Thành công!", 
-    info: user
+    users: users
   })
 }
